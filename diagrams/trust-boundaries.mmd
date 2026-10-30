@@ -1,0 +1,81 @@
+%% Güven Sınırları Diyagramı
+%% Bu diyagram, ajantik sistemdeki farklı güvenilirlik bölgelerini ve aralarındaki sınırları gösterir.
+
+graph TB
+    subgraph "🟢 Güvenilir Bölge (Tam Kontrol)"
+        direction TB
+        A[Sistem Talimatları]
+        B[Güvenlik Politikaları]
+        C[Onaylanmış Araç Tanımları]
+        D[Şifreleme Anahtarları]
+    end
+
+    subgraph "🟡 Kısmen Güvenilir Bölge (Doğrulama Gerekli)"
+        direction TB
+        E[Kullanıcı Girdisi]
+        F[Kullanıcı Oturum Bilgileri]
+        G[İç API Yanıtları]
+    end
+
+    subgraph "🔴 Güvenilmeyen Bölge (Her Zaman Temizle)"
+        direction TB
+        H[Dış E-posta İçeriği]
+        I[Web Sayfası Verileri]
+        J[Üçüncü Taraf API Yanıtları]
+        K[Paylaşılan Belgeler]
+        L[Kullanıcı Yüklenen Dosyalar]
+    end
+
+    subgraph "⚪ Ajan Çekirdeği"
+        direction TB
+        M[LLM Karar Motoru]
+        N[Bağlam Yöneticisi]
+        O[Bellek Katmanı]
+    end
+
+    subgraph "🔵 Çıktı Bölgesi (İzleme Gerekli)"
+        direction TB
+        P[E-posta Gönderme]
+        Q[Takvim Yazma]
+        R[Dosya Yazma]
+        S[API Çağrıları]
+    end
+
+    A ==>|"Doğrudan kontrol"| M
+    B ==>|"Doğrudan kontrol"| M
+    C ==>|"Doğrudan kontrol"| M
+
+    E -->|"Girdi filtreleme"| M
+    F -->|"Oturum doğrulama"| M
+    G -->|"Yanıt doğrulama"| M
+
+    H -.->|"Temizleme + Etiketleme"| N
+    I -.->|"Temizleme + Etiketleme"| N
+    J -.->|"Temizleme + Etiketleme"| N
+    K -.->|"Temizleme + Etiketleme"| N
+    L -.->|"Temizleme + Etiketleme"| N
+
+    M -->|"Politika kontrolü"| P
+    M -->|"Politika kontrolü"| Q
+    M -->|"Politika kontrolü"| R
+    M -->|"Politika kontrolü"| S
+
+    style A fill:#51cf66,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#51cf66,color:#fff
+    style D fill:#51cf66,color:#fff
+    style E fill:#ffd43b,color:#333
+    style F fill:#ffd43b,color:#333
+    style G fill:#ffd43b,color:#333
+    style H fill:#ff6b6b,color:#fff
+    style I fill:#ff6b6b,color:#fff
+    style J fill:#ff6b6b,color:#fff
+    style K fill:#ff6b6b,color:#fff
+    style L fill:#ff6b6b,color:#fff
+    style M fill:#f8f9fa,color:#333
+    style N fill:#f8f9fa,color:#333
+    style O fill:#f8f9fa,color:#333
+    style P fill:#339af0,color:#fff
+    style Q fill:#339af0,color:#fff
+    style R fill:#339af0,color:#fff
+    style S fill:#339af0,color:#fff

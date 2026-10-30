@@ -1,0 +1,89 @@
+%% Güvenli Ajan Sistemi Mimari Diyagramı
+%% Bu diyagram, güvenli bir üretim ajan sisteminin tüm bileşenlerini gösterir.
+
+graph TB
+    subgraph "Kullanıcı Katmanı"
+        A[Kullanıcı Arayüzü]
+    end
+
+    subgraph "Güvenlik Katmanı"
+        B[Girdi Filtresi<br/>Prompt Injection Tespiti]
+        C[Kimlik Doğrulama<br/>ve Delegasyon]
+    end
+
+    subgraph "Ajan Çekirdeği"
+        D[LLM Karar Motoru]
+        E[Bağlam Yöneticisi]
+        F[Bellek Katmanı]
+    end
+
+    subgraph "Politika Katmanı"
+        G[Risk Kademelendirme]
+        H[Onay Motoru]
+        I[Erişim Kontrolü]
+    end
+
+    subgraph "Araç Katmanı"
+        J[Araç Güvenlik Duvarı]
+        K[Parametre Doğrulayıcı]
+        L[Rate Limiter]
+    end
+
+    subgraph "Araçlar"
+        M[Takvim API]
+        N[E-posta API]
+        O[Dosya API]
+        P[Veritabanı]
+    end
+
+    subgraph "İzleme Katmanı"
+        Q[Denetim Logu]
+        R[Anomali Tespiti]
+        S[Çıktı İzleme]
+    end
+
+    subgraph "Veri Güvenliği"
+        T[PII Maskeleme]
+        U[Egress Politikası]
+        V[Sır Yönetimi]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    D --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    L --> N
+    L --> O
+    L --> P
+
+    D --> Q
+    J --> Q
+    H --> Q
+    Q --> R
+    D --> S
+    S --> T
+    T --> U
+    V --> J
+
+    style B fill:#ff6b6b,color:#fff
+    style C fill:#ff6b6b,color:#fff
+    style G fill:#339af0,color:#fff
+    style H fill:#339af0,color:#fff
+    style I fill:#339af0,color:#fff
+    style J fill:#ffa94d,color:#fff
+    style K fill:#ffa94d,color:#fff
+    style L fill:#ffa94d,color:#fff
+    style Q fill:#51cf66,color:#fff
+    style R fill:#51cf66,color:#fff
+    style S fill:#51cf66,color:#fff
+    style T fill:#be4bdb,color:#fff
+    style U fill:#be4bdb,color:#fff
+    style V fill:#be4bdb,color:#fff

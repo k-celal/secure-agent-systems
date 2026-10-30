@@ -1,0 +1,68 @@
+%% Politika ve Onay Akışı Sıra Diyagramı
+%% Bu diyagram, kullanıcı isteğinden aksiyona kadar tüm güvenlik kontrol noktalarını gösterir.
+
+sequenceDiagram
+    participant K as Kullanıcı
+    participant GF as Girdi Filtresi
+    participant A as Ajan (LLM)
+    participant PK as Politika Katmanı
+    participant OA as Onay Ağ Geçidi
+    participant AGD as Araç Güvenlik Duvarı
+    participant PD as Parametre Doğrulayıcı
+    participant AR as Araç
+    participant DL as Denetim Logu
+
+    K->>GF: Kullanıcı isteği
+    GF->>GF: Injection kalıp kontrolü
+    GF->>DL: Log: İstek alındı
+
+    alt Injection tespit edildi
+        GF-->>K: ⚠️ Şüpheli girdi tespit edildi
+        GF->>DL: Log: Injection tespiti (ALERT)
+    else Temiz girdi
+        GF->>A: Temizlenmiş girdi
+    end
+
+    A->>A: Karar ver: Hangi araç, hangi parametreler
+    A->>DL: Log: Karar
+
+    A->>PK: Aksiyon risk kontrolü
+    PK->>PK: Risk kademelendirme
+
+    alt Kademe 0-1 (Düşük risk)
+        PK-->>A: ✅ Otomatik onay
+        PK->>DL: Log: Otomatik onay
+    else Kademe 2+ (Yüksek risk)
+        PK->>OA: Onay talebi oluştur
+        OA->>K: "Bu aksiyonu onaylıyor musunuz?"
+        OA->>DL: Log: Onay talebi
+
+        alt Onaylandı
+            K->>OA: ✅ Onayla
+            OA-->>A: Onay verildi
+            OA->>DL: Log: Onay verildi
+        else Reddedildi
+            K->>OA: ❌ Reddet
+            OA-->>A: Onay reddedildi
+            OA->>DL: Log: Onay reddedildi
+        else Zaman aşımı
+            OA-->>A: ⏰ Süre doldu
+            OA->>DL: Log: Onay zaman aşımı
+        end
+    end
+
+    A->>AGD: Araç çağırma isteği
+    AGD->>AGD: İzin kontrolü
+    AGD->>AGD: Rate limit kontrolü
+    AGD->>PD: Parametre doğrulama
+    PD->>PD: Şema kontrolü
+    PD->>PD: Hassas veri kontrolü
+    PD-->>AGD: Doğrulanmış parametreler
+
+    AGD->>AR: Araç çalıştır
+    AR-->>AGD: Sonuç
+    AGD->>DL: Log: Araç çağrısı ve sonucu
+
+    AGD-->>A: Sonuç
+    A-->>K: Yanıt
+    A->>DL: Log: Yanıt
